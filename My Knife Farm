@@ -3,7 +3,7 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 -- [[ CONFIG ]]
 local config = {
     waits = {
-        speed = 0.1 -- Czas między kliknięciami (zmień tutaj)
+        speed = 0.1
     },
     clicker1 = false,
     clicker2 = false
@@ -17,11 +17,6 @@ local Window = Rayfield:CreateWindow({
 })
 
 local Tab = Window:CreateTab("Main Farm", 4483362458)
-
--- [[ PATHS ]]
-local plot = workspace.Plots.Plot_1.Plot_Models.BaseModel
-local btn1 = plot.ButtonModel.PacketClick:FindFirstChild("ClickDetector")
-local btn2 = plot.ButtonModel.PacketClick2:FindFirstChild("ClickDetector")
 
 -- [[ TOGGLES ]]
 Tab:CreateToggle({
@@ -42,11 +37,18 @@ Tab:CreateToggle({
    end,
 })
 
--- [[ LOOPS ]]
+-- [[ LOOPS WITH DYNAMIC PATHING ]]
 task.spawn(function()
     while true do
-        if config.clicker1 and btn1 then 
-            fireclickdetector(btn1) 
+        if config.clicker1 then
+            -- Szukamy przycisku co każdą pętlę, żeby uniknąć błędu nil
+            local success, btn = pcall(function() 
+                return workspace.Plots.Plot_1.Plot_Models.BaseModel.ButtonModel.PacketClick.ClickDetector 
+            end)
+            
+            if success and btn then
+                fireclickdetector(btn)
+            end
         end
         task.wait(config.waits.speed)
     end
@@ -54,8 +56,14 @@ end)
 
 task.spawn(function()
     while true do
-        if config.clicker2 and btn2 then 
-            fireclickdetector(btn2) 
+        if config.clicker2 then
+            local success, btn = pcall(function() 
+                return workspace.Plots.Plot_1.Plot_Models.BaseModel.ButtonModel.PacketClick2.ClickDetector 
+            end)
+            
+            if success and btn then
+                fireclickdetector(btn)
+            end
         end
         task.wait(config.waits.speed)
     end
@@ -63,7 +71,7 @@ end)
 
 Rayfield:Notify({
    Title = "VaenzzHub",
-   Content = "Two Toggles Ready",
+   Content = "Script Ready - Fixed Pathing",
    Duration = 3,
    Image = 4483362458,
 })
