@@ -1,76 +1,69 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- Config for easy adjustments
-local Config = {
-    WaitTime = 0.1, -- Adjust your wait() here
-    Enabled = false
+-- [[ CONFIG ]]
+local config = {
+    waits = {
+        speed = 0.1 -- Czas między kliknięciami (zmień tutaj)
+    },
+    clicker1 = false,
+    clicker2 = false
 }
 
--- Find the local player's plot
-local function getPlayerPlot()
-    for _, plot in pairs(workspace.Plots:GetChildren()) do
-        if plot:FindFirstChild("Owner") and plot.Owner.Value == game.Players.LocalPlayer.UserId then
-            return plot
-        elseif plot:GetAttribute("Owner") == game.Players.LocalPlayer.UserId then
-            return plot
-        end
-    end
-    return nil
-end
-
-local myPlot = getPlayerPlot()
-
 local Window = Rayfield:CreateWindow({
-    Name = "Plot Spammer",
-    LoadingTitle = "VAENBOT Interface",
-    LoadingSubtitle = "by Gemini",
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "VaenbotScripts",
-        FileName = "PlotConfig"
-    }
+   Name = "VaenzzHub",
+   LoadingTitle = "Loading Games...",
+   LoadingSubtitle = "by Vaenzz",
+   ConfigurationSaving = { Enabled = false }
 })
 
-local MainTab = Window:CreateTab("Main", 4483362458)
+local Tab = Window:CreateTab("Main Farm", 4483362458)
 
-MainTab:CreateToggle({
-    Name = "Auto Fire Upgrade",
-    CurrentValue = false,
-    Flag = "AutoFire",
-    Callback = function(Value)
-        Config.Enabled = Value
-        if Value then
-            task.spawn(function()
-                while Config.Enabled do
-                    if myPlot then
-                        local target = myPlot.Plot_Models.BaseModel.Slots.Slot1.UpgradePart.ClickDetector
-                        fireclickdetector(target)
-                    else
-                        Rayfield:Notify({
-                            Title = "Error",
-                            Content = "Could not find your plot!",
-                            Duration = 5
-                        })
-                        Config.Enabled = false
-                        break
-                    end
-                    task.wait(Config.WaitTime)
-                end
-            end)
+-- [[ PATHS ]]
+local plot = workspace.Plots.Plot_1.Plot_Models.BaseModel
+local btn1 = plot.ButtonModel.PacketClick:FindFirstChild("ClickDetector")
+local btn2 = plot.ButtonModel.PacketClick2:FindFirstChild("ClickDetector")
+
+-- [[ TOGGLES ]]
+Tab:CreateToggle({
+   Name = "Auto Click Button 1",
+   CurrentValue = false,
+   Flag = "Toggle1",
+   Callback = function(Value)
+      config.clicker1 = Value
+   end,
+})
+
+Tab:CreateToggle({
+   Name = "Auto Click Button 2",
+   CurrentValue = false,
+   Flag = "Toggle2",
+   Callback = function(Value)
+      config.clicker2 = Value
+   end,
+})
+
+-- [[ LOOPS ]]
+task.spawn(function()
+    while true do
+        if config.clicker1 and btn1 then 
+            fireclickdetector(btn1) 
         end
-    end,
-})
+        task.wait(config.waits.speed)
+    end
+end)
 
-MainTab:CreateSlider({
-    Name = "Wait Delay",
-    Min = 0,
-    Max = 1,
-    DefaultValue = 0.1,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 0.01,
-    ValueName = "Seconds",
-    Flag = "DelaySlider",
-    Callback = function(Value)
-        Config.WaitTime = Value
-    end,
+task.spawn(function()
+    while true do
+        if config.clicker2 and btn2 then 
+            fireclickdetector(btn2) 
+        end
+        task.wait(config.waits.speed)
+    end
+end)
+
+Rayfield:Notify({
+   Title = "VaenzzHub",
+   Content = "Two Toggles Ready",
+   Duration = 3,
+   Image = 4483362458,
 })
